@@ -35,9 +35,9 @@ db = Database()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-    # Using bleeding edge gemini-2.5-flash found in your model list
-    model = genai.GenerativeModel('gemini-2.5-flash')
-    print(f"✅ AI Model configured: gemini-2.5-flash")
+    # Using gemini-2.0-flash-exp (verified availability)
+    model = genai.GenerativeModel('gemini-2.0-flash-exp')
+    print(f"✅ AI Model configured: gemini-2.0-flash-exp")
 else:
     model = None
     print("⚠️  Warning: GEMINI_API_KEY not set. AI responses will be simulated.")
@@ -110,7 +110,11 @@ async def create_message(message: MessageRequest):
         db.add_message("user", message.content, user_timestamp)
         
         # Generate AI response
-        ai_response = await generate_ai_response(message.content)
+        try:
+            ai_response = await generate_ai_response(message.content)
+        except Exception as ai_error:
+            print(f"❌ AI Generation Critical Fail: {ai_error}")
+            ai_response = "I apologize, but I am unable to generate a response at this time. Please try again later."
         
         # Store AI response
         ai_timestamp = datetime.now().isoformat()
@@ -128,10 +132,26 @@ async def create_message(message: MessageRequest):
             for msg in messages
         ]
     
-    except HTTPException:
-        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing message: {str(e)}")
+        import traceback
+        print(f"❌ Critical Endpoint Error:\n{traceback.format_exc()}")
+        # Fallback: try to return whatever messages we have, plus an error message
+        try:
+            error_msg = f"System Error: {str(e)}"
+            db.add_message("assistant", error_msg, datetime.now().isoformat())
+            messages = db.get_all_messages()
+            return [
+                MessageResponse(
+                    message_id=msg[0],
+                    role=msg[1],
+                    content=msg[2],
+                    timestamp=msg[3]
+                )
+                for msg in messages
+            ]
+        except:
+             # Just raise if even the fallback fails
+             raise HTTPException(status_code=500, detail=f"Critical system failure: {str(e)}")
 
 
 async def generate_ai_response(user_message: str) -> str:

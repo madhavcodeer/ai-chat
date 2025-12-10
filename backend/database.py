@@ -19,7 +19,11 @@ class Database:
     def get_connection(self) -> sqlite3.Connection:
         """Get or create database connection"""
         if self.connection is None:
-            self.connection = sqlite3.connect(self.db_path, check_same_thread=False)
+            self.connection = sqlite3.connect(
+                self.db_path, 
+                check_same_thread=False,
+                timeout=10.0  # Wait up to 10s for lock
+            )
         return self.connection
     
     def create_tables(self):
