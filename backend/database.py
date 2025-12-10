@@ -13,7 +13,14 @@ class Database:
     
     def __init__(self, db_path: str = "chat.db"):
         """Initialize database connection"""
-        self.db_path = db_path
+        # On Vercel, we must use /tmp directory as it's the only writable location
+        import os
+        if os.environ.get('VERCEL') or os.path.exists('/var/task'):
+            self.db_path = "/tmp/chat.db"
+            print(f"📂 Vercel detected: Using database at {self.db_path}")
+        else:
+            self.db_path = db_path
+        
         self.connection = None
     
     def get_connection(self) -> sqlite3.Connection:
