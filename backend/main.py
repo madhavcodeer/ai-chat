@@ -12,6 +12,7 @@ from datetime import datetime
 import os
 from dotenv import load_dotenv
 from database import Database
+from fastapi.staticfiles import StaticFiles
 
 # Load environment variables from .env file
 load_dotenv()
@@ -207,6 +208,15 @@ async def clear_messages():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error clearing messages: {str(e)}")
 
+
+# Mount the frontend/dist directory to serve the React app
+# This must be after all API routes
+frontend_dist = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
+
+if os.path.exists(frontend_dist):
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="static")
+else:
+    print(f"⚠️ Frontend dist folder not found at {frontend_dist}. Run 'npm run build' in frontend directory first.")
 
 if __name__ == "__main__":
     import uvicorn
