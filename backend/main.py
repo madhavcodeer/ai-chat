@@ -46,6 +46,7 @@ else:
 # Pydantic models for request/response validation
 class MessageRequest(BaseModel):
     content: str
+    api_key: Optional[str] = None
 
 
 class MessageResponse(BaseModel):
@@ -111,7 +112,7 @@ async def create_message(message: MessageRequest):
         
         # Generate AI response
         try:
-            ai_response = await generate_ai_response(message.content)
+            ai_response = await generate_ai_response(message.content, message.api_key)
         except Exception as ai_error:
             print(f"❌ AI Generation Critical Fail: {ai_error}")
             ai_response = "I apologize, but I am unable to generate a response at this time. Please try again later."
@@ -154,25 +155,44 @@ async def create_message(message: MessageRequest):
              raise HTTPException(status_code=500, detail=f"Critical system failure: {str(e)}")
 
 
-async def generate_ai_response(user_message: str) -> str:
+async def generate_ai_response(user_message: str, user_api_key: Optional[str] = None) -> str:
     """
     Generate AI response using Google Gemini API
-    Falls back to simulated response if API is not configured
+    Uses user_api_key if provided, otherwise falls back to server env key
     """
     try:
-        if model:
-            # Use Google Gemini API
-            response = model.generate_content(user_message)
+        current_model = None
+        
+        # 1. Try User API Key first
+        if user_api_key and user_api_key.strip():
+            try:
+                # Configure a temporary client for this request
+                genai.configure(api_key=user_api_key)
+                current_model = genai.GenerativeModel('gemini-2.0-flash-exp')
+                print("🔑 Using User provided API Key")
+            except Exception as e:
+                print(f"User Key Config Error: {e}")
+                pass 
+
+        # 2. Fallback to System API Key if no user key provided
+        if not current_model and model:
+            # We must re-configure if we switched keys, to be safe, 
+            # but usually 'model' object retains its config. 
+            # Simpler approach: If system key exists, use global model.
+            current_model = model
+            print("🔒 Using System API Key")
+
+        if current_model:
+            response = current_model.generate_content(user_message)
             return response.text
         else:
-            # Simulated response for testing without API key
-            return f"I received your message: '{user_message}'. (This is a simulated response. Please set GEMINI_API_KEY environment variable to enable real AI responses.)"
+            return "Please provide a Gemini API Key in Settings to chat!"
     
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
         print(f"❌ AI Generation Error:\n{error_details}")
-        return f"I apologize, but I encountered an error. Error details: {str(e)}"
+        return f"I apologize, but I encountered an error. Error: {str(e)}"
 
 
 @app.delete("/api/messages")

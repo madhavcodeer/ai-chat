@@ -7,6 +7,9 @@ import LoadingIndicator from './components/LoadingIndicator'
 const API_BASE_URL = '/api'
 
 function App() {
+  const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '')
+  const [showSettings, setShowSettings] = useState(false)
+
   const [messages, setMessages] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -40,6 +43,12 @@ function App() {
     }
   }
 
+  const handleApiKeyChange = (e) => {
+    const newKey = e.target.value
+    setApiKey(newKey)
+    localStorage.setItem('gemini_api_key', newKey)
+  }
+
   const sendMessage = async (content) => {
     if (!content.trim()) return
 
@@ -52,7 +61,10 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({
+          content,
+          api_key: apiKey
+        }),
       })
 
       if (!response.ok) {
@@ -78,11 +90,41 @@ function App() {
             <div className="logo-icon">✨</div>
             <h1>AI Chat</h1>
           </div>
-          <div className="status-indicator">
-            <span className="status-dot"></span>
-            <span className="status-text">Online</span>
+
+          <div className="header-actions">
+            <button
+              className={`settings-btn ${showSettings ? 'active' : ''}`}
+              onClick={() => setShowSettings(!showSettings)}
+              title="API Key Settings"
+            >
+              ⚙️
+            </button>
+            <div className="status-indicator">
+              <span className="status-dot"></span>
+              <span className="status-text">Online</span>
+            </div>
           </div>
         </div>
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className="settings-panel">
+            <div className="settings-content">
+              <h3>Google Gemini API Key</h3>
+              <p>Enter your own API Key to use your own quota.</p>
+              <input
+                type="password"
+                value={apiKey}
+                onChange={handleApiKeyChange}
+                placeholder="AIzaPv..."
+                className="api-key-input"
+              />
+              <div className="settings-info">
+                Key is saved locally in your browser.
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Chat Container */}

@@ -13,19 +13,6 @@ A **production-quality AI Chat Application** with persistent chat history, built
 - 🎨 **Modern, World-Class UI** - Glassmorphism design with smooth animations
 - 💬 **Chat Interface** - Left-aligned AI messages, right-aligned user messages
 - 📜 **Auto-Scroll** - Automatically scrolls to latest message
-- ⏳ **Loading States** - Beautiful loading indicator while AI responds
-- 📱 **Responsive Design** - Works perfectly on all screen sizes
-- 🎭 **Smooth Animations** - Message slide-ins, hover effects, micro-interactions
-
-### Backend
-- 🔌 **REST API** - Clean FastAPI endpoints
-- 💾 **Persistent Storage** - SQLite database for chat history
-- 🤖 **AI Integration** - Google Gemini API for intelligent responses
-- 🔒 **Error Handling** - Comprehensive error handling and validation
-- 🚀 **Async Processing** - Fast, non-blocking operations
-
-## 🏗️ Project Structure
-
 ```
 ai-chat-app/
 ├── backend/

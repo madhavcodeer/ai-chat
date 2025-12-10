@@ -267,7 +267,104 @@ body {
     font-size: 1.25rem;
   }
 
-  .status-text {
-    display: none;
+  .status-text {}
+}
+
+/* Header Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.settings-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+  opacity: 0.7;
+}
+
+.settings-btn:hover {
+  opacity: 1;
+  background: var(--glass-bg);
+}
+
+.settings-btn.active {
+  opacity: 1;
+  background: var(--glass-border);
+}
+
+/* Settings Panel */
+.settings-panel {
+  position: absolute;
+  top: 100%;
+  right: var(--spacing-xl);
+  width: 300px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 101;
+  margin-top: var(--spacing-sm);
+  backdrop-filter: blur(20px);
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-content h3 {
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-primary);
+}
+
+.settings-content p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.api-key-input {
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+  margin-bottom: var(--spacing-xs);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.api-key-input:focus {
+  border-color: var(--accent-primary);
+}
+
+.settings-info {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .settings-panel {
+    right: var(--spacing-md);
+    width: calc(100% - var(--spacing-xl));
   }
 }
