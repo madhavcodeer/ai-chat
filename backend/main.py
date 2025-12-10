@@ -62,7 +62,7 @@ async def startup_event():
     print("✅ Database initialized successfully")
 
 
-@app.get("/")
+@app.get("/api")
 async def root():
     """Health check endpoint"""
     return {
@@ -72,7 +72,7 @@ async def root():
     }
 
 
-@app.get("/messages", response_model=List[MessageResponse])
+@app.get("/api/messages", response_model=List[MessageResponse])
 async def get_messages():
     """
     Fetch all chat messages from database
@@ -93,7 +93,7 @@ async def get_messages():
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 
-@app.post("/messages", response_model=List[MessageResponse])
+@app.post("/api/messages", response_model=List[MessageResponse])
 async def create_message(message: MessageRequest):
     """
     Process user message and generate AI response
@@ -155,7 +155,7 @@ async def generate_ai_response(user_message: str) -> str:
         return f"I apologize, but I encountered an error. Error details: {str(e)}"
 
 
-@app.delete("/messages")
+@app.delete("/api/messages")
 async def clear_messages():
     """
     Clear all messages from database
