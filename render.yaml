@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ai-chat-app
+    runtime: python
+    buildCommand: ./render-build.sh
+    startCommand: python backend/main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: GEMINI_API_KEY
+        sync: false
