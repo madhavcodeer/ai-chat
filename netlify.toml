@@ -1,0 +1,7 @@
+[build]
+  command = "sh ./render-build.sh"
+  publish = "frontend/dist"
+
+[build.environment]
+  PYTHON_VERSION = "3.11"
+  GEMINI_API_KEY = "your_key_here_if_needed"
