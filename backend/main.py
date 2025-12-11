@@ -193,7 +193,16 @@ async def generate_ai_response(user_message: str, user_api_key: Optional[str] = 
         import traceback
         error_details = traceback.format_exc()
         print(f"❌ AI Generation Error:\n{error_details}")
-        return f"I apologize, but I encountered an error. Error: {str(e)}"
+        
+        error_str = str(e)
+        if "429" in error_str or "quota" in error_str.lower():
+             return "✨ I'm slightly overloaded (Rate Limit Reached). Please wait 10-20 seconds and try again."
+        
+        # Determine if it's a huge JSON dump error and simplify it
+        if len(error_str) > 200 and "{" in error_str:
+            return "I encountered a technical error connecting to the AI service. Please try again later."
+            
+        return f"I apologize, but I encountered an error: {error_str}"
 
 
 @app.delete("/api/messages")
