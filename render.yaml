@@ -4,7 +4,7 @@ services:
     plan: free
     runtime: python
     buildCommand: ./render-build.sh
-    startCommand: "if [ -f backend/main.py ]; then python backend/main.py; else python main.py; fi"
+    startCommand: ./run_app.sh
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
