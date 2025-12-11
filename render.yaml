@@ -2,9 +2,7 @@ services:
   - type: web
     name: ai-chat-app
     plan: free
-    runtime: python
-    buildCommand: ./render-build.sh
-    startCommand: ./run_app.sh
+    runtime: docker
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
