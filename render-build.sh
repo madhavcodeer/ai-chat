@@ -5,13 +5,21 @@ set -o errexit
 echo "Build Start: Upgrading pip and build tools..."
 pip install --upgrade pip setuptools wheel
 
-echo "Building Frontend..."
-cd frontend
-npm install
-npm run build
-cd ..
+# Check if pre-built files exist (from git)
+if [ -d "frontend/dist" ]; then
+  echo "✅ Pre-built frontend found. Skipping npm install."
+else
+  # Only try building if absolutely necessary (fallback)
+  echo "⚠️ Pre-built frontend MISSING. This might fail on Python runtime."
+  if command -v npm &> /dev/null; then
+      cd frontend
+      npm install
+      npm run build
+      cd ..
+  fi
+fi
 
-# Ensure we stay in root
+# Ensure we stay in root and install backend deps
 echo "Installing Backend Dependencies..."
 pip install -r requirements.txt
 
