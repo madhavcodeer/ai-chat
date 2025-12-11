@@ -214,7 +214,18 @@ async def clear_messages():
 frontend_dist = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
 
 if os.path.exists(frontend_dist):
-    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="static")
+    app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+    
+    from fastapi.responses import FileResponse
+
+    @app.get("/{full_path:path}")
+    async def serve_react_app(full_path: str):
+        # API routes are already handled above, so this catches everything else
+        # Return index.html for any non-API route (SPA support)
+        index_path = os.path.join(frontend_dist, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        return {"error": "Frontend build not found. Run 'npm run build'"}
 else:
     print(f"⚠️ Frontend dist folder not found at {frontend_dist}. Run 'npm run build' in frontend directory first.")
 
