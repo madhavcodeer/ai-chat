@@ -1,6 +1,7 @@
 services:
   - type: web
     name: ai-chat-app
+    plan: free
     runtime: python
     buildCommand: ./render-build.sh
     startCommand: python backend/main.py
