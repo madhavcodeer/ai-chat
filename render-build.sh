@@ -24,4 +24,9 @@ else
   echo "<h1>Build Failed</h1>" > frontend/dist/index.html
 fi
 
+# Fix for user's specific Render setting expecting 'ai' directory
+echo "Copying to 'ai' directory to match Render settings..."
+rm -rf ai
+cp -r frontend/dist ai
+
 echo "Build Finished!"
