@@ -211,23 +211,30 @@ async def clear_messages():
 
 # Mount the frontend/dist directory to serve the React app
 # This must be after all API routes
+# Mount the frontend/dist directory to serve the React app
 frontend_dist = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
 
 if os.path.exists(frontend_dist):
     app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
-    
-    from fastapi.responses import FileResponse
 
-    @app.get("/{full_path:path}")
-    async def serve_react_app(full_path: str):
-        # API routes are already handled above, so this catches everything else
-        # Return index.html for any non-API route (SPA support)
-        index_path = os.path.join(frontend_dist, "index.html")
-        if os.path.exists(index_path):
-            return FileResponse(index_path)
-        return {"error": "Frontend build not found. Run 'npm run build'"}
-else:
-    print(f"⚠️ Frontend dist folder not found at {frontend_dist}. Run 'npm run build' in frontend directory first.")
+from fastapi.responses import FileResponse, HTMLResponse
+
+@app.get("/")
+async def serve_root():
+    """Serve the index.html at the root"""
+    index_path = os.path.join(frontend_dist, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return HTMLResponse("<h1>Frontend is building... please refresh in 1 minute.</h1>")
+
+@app.get("/{full_path:path}")
+async def serve_react_app(full_path: str):
+    """Catch-all for SPA routing"""
+    # API routes are already handled above, so this catches everything else
+    index_path = os.path.join(frontend_dist, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return HTMLResponse("<h1>Frontend is building... please refresh in 1 minute.</h1>")
 
 if __name__ == "__main__":
     import uvicorn
